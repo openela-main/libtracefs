@@ -1,0 +1,11 @@
+--- a/scripts/utils.mk
++++ b/scripts/utils.mk
+@@ -56,7 +56,7 @@
+ 
+ do_compile_shared_library =			\
+ 	($(print_shared_lib_compile)		\
+-	$(CC) --shared $^ '-Wl,-soname,$(1),-rpath=$$ORIGIN' -o $@ $(LDFLAGS) $(LIBS))
++	$(CC) --shared $^ '-Wl,-soname,$(1),-rpath=$$ORIGIN' -o $@ $(GCCLDFLAGS) $(LDFLAGS) $(LIBS))
+ 
+ do_compile_plugin_obj =				\
+ 	($(print_plugin_obj_compile)		\
