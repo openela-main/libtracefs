@@ -11,7 +11,7 @@
 
 Name: libtracefs
 Version: 1.3.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2+ and GPLv2+
 Summary: Library for access kernel tracefs
 
@@ -65,6 +65,9 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %{_libdir}/%{name}.so
 
 %changelog
+* Thu Sep 07 2023 Jerome Marchand <jmarchan@redhat.com> - 1.3.1-3
+- Add gating (rhbz#2171394)
+
 * Thu Feb 2 2023 Michael Petlan <mpetlan@redhat.com> - 1.3.1-2
 - Remove conflict with trace-cmd
   Related: rhbz#2159965
