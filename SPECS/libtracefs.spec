@@ -10,7 +10,7 @@
 %global _lto_cflags %nil
 
 Name: libtracefs
-Version: 1.3.1
+Version: 1.6.4
 Release: 1%{?dist}
 License: LGPLv2+ and GPLv2+
 Summary: Library for access kernel tracefs
@@ -23,7 +23,6 @@ URL: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/
 #Source0: libtracefs-%%{version}.tar.gz
 #Source0: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%%{commit}.tar.gz
 Source0: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%{version}.tar.gz
-Patch0:  libtracefs-1.0.2-harden-linking.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  pkgconfig(libtraceevent)
@@ -42,7 +41,6 @@ Development headers of %{name}
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 %set_build_flags
@@ -58,8 +56,7 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %files
 %license LICENSES/LGPL-2.1
 %license LICENSES/GPL-2.0
-%{_libdir}/%{name}.so.1
-%{_libdir}/%{name}.so.1.3.1
+%{_libdir}/%{name}.so.*
 
 %files devel
 %{_includedir}/tracefs/tracefs.h
@@ -67,6 +64,9 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %{_libdir}/%{name}.so
 
 %changelog
+* Fri Aug 16 2024 Jerome Marchand <jmarchan@redhat.com> - 1.6.4-1
+- Rebase to 1.6.4 (RHEL-36547)
+
 * Tue Aug 30 2022 Michael Petlan <mpetlan@redhat.com> - 1.3.1-1
 - Rebase to 1.3.1
   Related: rhbz#2075215
