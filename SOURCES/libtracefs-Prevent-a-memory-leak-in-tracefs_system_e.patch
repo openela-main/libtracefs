@@ -1,0 +1,40 @@
+From 7d77b83ce83c318cb83cf2529f45cc950edb44d5 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:22 +0200
+Subject: [PATCH 08/15] libtracefs: Prevent a memory leak in
+ tracefs_system_events()
+
+If add_list_string() fails, event isn't freed. Free event before
+calling add_list_string();
+
+Fixes a RESSOURCE_LEAK error (CWE-772)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-9-jmarchan@redhat.com
+
+Fixes: 056a177e1d686 ("libtracefs: Restructure how string lists work")
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-events.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/tracefs-events.c b/src/tracefs-events.c
+index 906dbe8..d65837e 100644
+--- a/src/tracefs-events.c
++++ b/src/tracefs-events.c
+@@ -919,11 +919,10 @@ char **tracefs_system_events(const char *tracing_dir, const char *system)
+ 			free(event);
+ 			continue;
+ 		}
++		free(event);
+ 
+ 		if (add_list_string(&events, name) < 0)
+ 			goto out_free;
+-
+-		free(event);
+ 	}
+ 
+ 	closedir(dir);
+-- 
+2.45.2
+

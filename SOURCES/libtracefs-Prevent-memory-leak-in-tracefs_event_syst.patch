@@ -1,0 +1,42 @@
+From efdf7f7fcb9a4e0a5ccefb805d78123332aa7a23 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:19 +0200
+Subject: [PATCH 05/15] libtracefs: Prevent memory leak in
+ tracefs_event_systems()
+
+If an error is encountered in the loop, enable and sys might not get
+freed. Move the calls to free() before possibly exiting the loop.
+
+Fixes a RESSOURCE_LEAK error (CWE-772)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-6-jmarchan@redhat.com
+
+Fixes: 056a177e1d686 ("libtracefs: Restructure how string lists work")
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-events.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tracefs-events.c b/src/tracefs-events.c
+index 1b1693c..906dbe8 100644
+--- a/src/tracefs-events.c
++++ b/src/tracefs-events.c
+@@ -854,12 +854,12 @@ char **tracefs_event_systems(const char *tracing_dir)
+ 		enable = trace_append_file(sys, "enable");
+ 
+ 		ret = stat(enable, &st);
++		free(enable);
++		free(sys);
+ 		if (ret >= 0) {
+ 			if (add_list_string(&systems, name) < 0)
+ 				goto out_free;
+ 		}
+-		free(enable);
+-		free(sys);
+ 	}
+ 
+ 	closedir(dir);
+-- 
+2.45.2
+

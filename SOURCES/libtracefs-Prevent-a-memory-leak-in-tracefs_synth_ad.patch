@@ -1,0 +1,53 @@
+From 2342293f9aac9ce3706eb7ffaab0e5cf11231215 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:18 +0200
+Subject: [PATCH 04/15] libtracefs: Prevent a memory leak in
+ tracefs_synth_add_end_field()
+
+Free tmp_var in the error path.
+
+Fixes a RESSOURCE_LEAK error (CWE-772)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-5-jmarchan@redhat.com
+
+Fixes: f1cdbe9b52b07 ("libtracefs: Have end event variables not be the end event field name")
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-hist.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/tracefs-hist.c b/src/tracefs-hist.c
+index 87287b5..4f4971e 100644
+--- a/src/tracefs-hist.c
++++ b/src/tracefs-hist.c
+@@ -1576,7 +1576,7 @@ int tracefs_synth_add_end_field(struct tracefs_synth *synth,
+ 	const struct tep_format_field *field;
+ 	const char *hname = NULL;
+ 	char *tmp_var = NULL;
+-	int ret;
++	int ret = -1;
+ 
+ 	if (!synth || !end_field) {
+ 		errno = EINVAL;
+@@ -1594,15 +1594,15 @@ int tracefs_synth_add_end_field(struct tracefs_synth *synth,
+ 		tmp_var = new_arg(synth);
+ 
+ 	if (!trace_verify_event_field(synth->end_event, end_field, &field))
+-		return -1;
++		goto out;
+ 
+ 	ret = add_var(&synth->end_vars, name ? hname : tmp_var, end_field, false);
+ 	if (ret)
+ 		goto out;
+ 
+ 	ret = add_synth_fields(synth, field, name, hname ? : tmp_var);
+-	free(tmp_var);
+  out:
++	free(tmp_var);
+ 	return ret;
+ }
+ 
+-- 
+2.45.2
+

@@ -1,0 +1,41 @@
+From aecc0b7b4d5ba986517fb86fb0a87a110ad0c816 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:15 +0200
+Subject: [PATCH 01/15] libtracefs: Call va_end() before exiting
+ tracefs_hist_set_sort_key()
+
+Each invocation of va_start() must be matched by a corresponding
+invocation of va_end() in the same function. If add_sort_key() fails,
+tracefs_hist_set_sort_key() exits without calling it. Call va_end
+after add_sort_key() fails.
+
+Fixes a VARARGS error (CWE-237)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-2-jmarchan@redhat.com
+
+Fixes: 5d1c2ea2d6a7b ("libtracefs: Implement API to create / modify and display histograms")
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-hist.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/tracefs-hist.c b/src/tracefs-hist.c
+index 2b4f17f..87287b5 100644
+--- a/src/tracefs-hist.c
++++ b/src/tracefs-hist.c
+@@ -596,8 +596,10 @@ int tracefs_hist_set_sort_key(struct tracefs_hist *hist,
+ 		if (!sort_key)
+ 			break;
+ 		tmp = add_sort_key(hist, sort_key, list);
+-		if (!tmp)
++		if (!tmp) {
++			va_end(ap);
+ 			goto fail;
++		}
+ 		list = tmp;
+ 	}
+ 	va_end(ap);
+-- 
+2.45.2
+

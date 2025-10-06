@@ -1,0 +1,50 @@
+From 6b356651a3fdbb63531036941dd02fd60da5e52d Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:16 +0200
+Subject: [PATCH 02/15] libtracefs: Prevent memory leak in append_filer()
+
+The buffer containing the new filter isn't freed if we encounter an
+error after it was allocated. Free tmp in the error path.
+
+Fixes a RESSOURCE_LEAK error (CWE-772)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-3-jmarchan@redhat.com
+
+Fixes: 24b856f0bcf3d ("libtracefs: Add filter creating and verify API")
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-filter.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/tracefs-filter.c b/src/tracefs-filter.c
+index afe3338..1b1c60e 100644
+--- a/src/tracefs-filter.c
++++ b/src/tracefs-filter.c
+@@ -250,12 +250,12 @@ static int append_filter(char **filter, unsigned int *state,
+ 	case TRACEFS_COMPARE_NE: tmp = append_string(tmp, NULL, " != "); break;
+ 	case TRACEFS_COMPARE_RE:
+ 		if (!is_string)
+-			goto inval;
++			goto free;
+ 		tmp = append_string(tmp, NULL, "~");
+ 		break;
+ 	default:
+ 		if (is_string)
+-			goto inval;
++			goto free;
+ 	}
+ 
+ 	switch (compare) {
+@@ -277,6 +277,8 @@ static int append_filter(char **filter, unsigned int *state,
+ 	*state = S_COMPARE;
+ 
+ 	return 0;
++free:
++	free(tmp);
+ inval:
+ 	errno = EINVAL;
+ 	return -1;
+-- 
+2.45.2
+

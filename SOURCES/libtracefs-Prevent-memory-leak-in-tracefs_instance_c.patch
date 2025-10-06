@@ -1,0 +1,34 @@
+From 5e5b2a760b13aeecd72da9bda392d2d3510fc409 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:24 +0200
+Subject: [PATCH 10/15] libtracefs: Prevent memory leak in
+ tracefs_instance_create()
+
+Free the path of the instance directory in the error path.
+
+Fixes a RESSOURCE_LEAK error (CWE-772)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-11-jmarchan@redhat.com
+
+Fixes: ebbb8507de560 libtracefs: Combine allocate and create APIs into one
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-instance.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tracefs-instance.c b/src/tracefs-instance.c
+index 9a26708..dd7decd 100644
+--- a/src/tracefs-instance.c
++++ b/src/tracefs-instance.c
+@@ -217,6 +217,7 @@ struct tracefs_instance *tracefs_instance_create(const char *name)
+ 	return inst;
+ 
+ error:
++	tracefs_put_tracing_file(path);
+ 	tracefs_instance_free(inst);
+ 	return NULL;
+ }
+-- 
+2.45.2
+

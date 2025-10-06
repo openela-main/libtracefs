@@ -1,0 +1,36 @@
+From 590e45220531201e09c9a4292bded25d7c941ab8 Mon Sep 17 00:00:00 2001
+From: Jerome Marchand <jmarchan@redhat.com>
+Date: Thu, 6 Jun 2024 17:38:28 +0200
+Subject: [PATCH 14/15] libtracefs: Close dir in the error path in
+ tracefs_event_systems()
+
+In tracefs_event_systems, we don't close dir if add_list_string()
+fails. At this point, just breaking out of the loop fixes that.
+
+Fixes a RESSOURCE_LEAK error (CWE-772)
+
+Link: https://lore.kernel.org/linux-trace-devel/20240606153830.2666120-15-jmarchan@redhat.com
+
+Fixes: 056a177e1d686 ("libtracefs: Restructure how string lists work")
+Signed-off-by: Jerome Marchand <jmarchan@redhat.com>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ src/tracefs-events.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tracefs-events.c b/src/tracefs-events.c
+index 1fa3f2f..83069aa 100644
+--- a/src/tracefs-events.c
++++ b/src/tracefs-events.c
+@@ -858,7 +858,7 @@ char **tracefs_event_systems(const char *tracing_dir)
+ 		free(sys);
+ 		if (ret >= 0) {
+ 			if (add_list_string(&systems, name) < 0)
+-				goto out_free;
++				break;
+ 		}
+ 	}
+ 
+-- 
+2.45.2
+
