@@ -10,8 +10,8 @@
 %global _lto_cflags %nil
 
 Name: libtracefs
-Version: 1.6.4
-Release: 1%{?dist}
+Version: 1.8.1
+Release: 2%{?dist}
 License: LGPLv2+ and GPLv2+
 Summary: Library for access kernel tracefs
 
@@ -25,7 +25,7 @@ URL: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/
 Source0: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  pkgconfig(libtraceevent)
+BuildRequires:  pkgconfig(libtraceevent) >= 1.8.0
 # The libtracefs is meant to be used by perf, trace-cmd etc. in the future, before it's ready in perf, let's add a conflict
 Conflicts: trace-cmd < 2.9.1-6
 
@@ -64,6 +64,12 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %{_libdir}/%{name}.so
 
 %changelog
+* Mon Mar 03 2025 Jerome Marchand <jmarchan@redhat.com> - 1.8.1-2
+- Rebuild without side-tags (RHEL-81923)
+
+* Mon Feb 24 2025 Jerome Marchand <jmarchan@redhat.com> - 1.8.1-1
+- Rebase to 1.8.1 (Related: RHEL-76155)
+
 * Fri Aug 16 2024 Jerome Marchand <jmarchan@redhat.com> - 1.6.4-1
 - Rebase to 1.6.4 (RHEL-36547)
 
