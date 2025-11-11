@@ -1,26 +1,11 @@
 Name: libtracefs
-Version: 1.8.0
-Release: 6%{?dist}
+Version: 1.8.2
+Release: 1%{?dist}
 License: LGPL-2.1-or-later AND GPL-2.0-or-later AND GPL-2.0-only
 Summary: Library for access kernel tracefs
 
 URL: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/
 Source0: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%{version}.tar.gz
-Patch0: libtracefs-Call-va_end-before-exiting-tracefs_hist_s.patch
-Patch1: libtracefs-Prevent-memory-leak-in-append_filer.patch
-Patch2: libtracefs-Prevent-a-memory-leak-in-update_fields.patch
-Patch3: libtracefs-Prevent-a-memory-leak-in-tracefs_synth_ad.patch
-Patch4: libtracefs-Prevent-memory-leak-in-tracefs_event_syst.patch
-Patch5: libtracefs-Don-t-leak-socket-file-descriptor-in-open.patch
-Patch6: libtracefs-Prevent-a-memory-leak-in-add_func_str.patch
-Patch7: libtracefs-Prevent-a-memory-leak-in-tracefs_system_e.patch
-Patch8: libtracefs-Prevent-a-memory-leak-in-open_cpu_files.patch
-Patch9: libtracefs-Prevent-memory-leak-in-tracefs_instance_c.patch
-Patch10: libtracefs-my_yyinput-should-return-0-when-no-data-c.patch
-Patch11: libtracefs-Prevent-memory-leak-in-tracefs_dynevent_g.patch
-Patch12: libtracefs-Close-dir-in-the-error-path-in-tracefs_sy.patch
-Patch13: libtracefs-Close-dir-in-the-error-path-in-tracefs_ev.patch
-Patch14: libtracefs-Initialize-val-in-build_filter.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -54,7 +39,8 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %license LICENSES/LGPL-2.1
 %license LICENSES/GPL-2.0
 %{_libdir}/%{name}.so.1
-%{_libdir}/%{name}.so.1.8.0
+%{_libdir}/%{name}.so.%{version}
+%{bash_completions_dir}/tracefs_sql.bash
 
 %files devel
 %{_includedir}/tracefs/tracefs.h
@@ -62,6 +48,13 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 %{_libdir}/%{name}.so
 
 %changelog
+* Wed Jun 18 2025 Jerome Marchand <jmarchan@redhat.com> - 1.8.2-1
+- Rebase to version 1.8.2 (RHEL-94793)
+
+* Wed May 28 2025 Tomas Glozar <tglozar@redhat.com> - 1.8.0-7
+- Fix read file failure code checking
+  Resolves: RHEL-93863
+
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 1.8.0-6
 - Bump release for October 2024 mass rebuild:
   Resolves: RHEL-64018
